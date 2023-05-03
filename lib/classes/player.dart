@@ -1,9 +1,14 @@
 class Player {
-  String name;
-  String? car;
-  String? imgUrl;
+  String playerID;
+  String userName;
+  String password;
+  bool? connected;
+  String? lastSeen;
+
 
   Player({
-    required this.name
+    required this.playerID,
+    required this.userName,
+    required this.password
   });
 }

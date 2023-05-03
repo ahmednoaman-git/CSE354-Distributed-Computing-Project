@@ -15,6 +15,6 @@ class Message {
     required this.private,
     required this.content
   }) {
-    outgoingMessage = from.name == Config.currentPlayer.name;
+    outgoingMessage = from.playerID == Config.currentPlayer.playerID;
   }
 }

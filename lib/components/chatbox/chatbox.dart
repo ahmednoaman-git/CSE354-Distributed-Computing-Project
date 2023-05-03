@@ -1,5 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'package:distributed_computing_project/backend/api/api_client.dart';
+import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/components/chatbox/messagebubble.dart';
 import 'package:distributed_computing_project/config.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +14,12 @@ List<Message> messages = [];
 
 class ChatBox extends StatefulWidget {
   const ChatBox({Key? key}) : super(key: key);
-
   @override
   State<ChatBox> createState() => _ChatBoxState();
 }
 
 class _ChatBoxState extends State<ChatBox> {
+  final ApiClient serverApi = ApiClient('http://localhost:3000');
   TextEditingController messageInputController = TextEditingController();
   ScrollController scrollController = ScrollController();
 
@@ -28,7 +30,7 @@ class _ChatBoxState extends State<ChatBox> {
       height: 500,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFF3E3E3E)
+        color: AppColors.containerBackground
       ),
       child: Column(
         children: [
@@ -64,7 +66,7 @@ class _ChatBoxState extends State<ChatBox> {
             width: 350,
             height: 500-435,
             decoration: const BoxDecoration(
-              color: Color(0xFF383838),
+              color: AppColors.containerBackgroundDarker,
               borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20))
             ),
             child: Center(
@@ -72,7 +74,7 @@ class _ChatBoxState extends State<ChatBox> {
                 margin: const EdgeInsets.only(left: 5, right: 5),
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: const Color(0xFFD0D0D0),
+                    color: AppColors.highlight,
                     width: 1.5
                   ),
                   borderRadius: BorderRadius.circular(40)
@@ -86,16 +88,16 @@ class _ChatBoxState extends State<ChatBox> {
                         controller: messageInputController,
                         decoration: const InputDecoration(
                           hintText: 'Send a message...',
-                          hintStyle: TextStyle(color: Color(0xFFD0D0D0), fontWeight: FontWeight.w100),
+                          hintStyle: TextStyle(color: AppColors.highlight, fontWeight: FontWeight.w100),
                           border: InputBorder.none,
                           constraints: BoxConstraints(
                             minWidth: 275,
                             maxWidth: 275
                           )
                         ),
-                        cursorColor: const Color(0xFFD0D0D0),
+                        cursorColor: AppColors.highlight,
                         style: const TextStyle(
-                          color: Color(0xFFD0D0D0)
+                          color: AppColors.highlight
                         ),
                         onSubmitted: (text) {
                           setState(() {
@@ -110,10 +112,10 @@ class _ChatBoxState extends State<ChatBox> {
                         width: 35,
                         height: 35,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF007166),
+                          color: AppColors.accent,
                           borderRadius: BorderRadius.circular(20)
                         ),
-                        child: const Center(child: FaIcon(FontAwesomeIcons.solidPaperPlane, color: Color(0xFFD0D0D0), size: 17,)),
+                        child: const Center(child: FaIcon(FontAwesomeIcons.solidPaperPlane, color: AppColors.highlight, size: 17,)),
                       ),
                       onTap: () {
                         setState(() {
@@ -131,7 +133,7 @@ class _ChatBoxState extends State<ChatBox> {
     );
   }
 
-  void _addMessage() {
+  void _addMessage() async {
     if (messageInputController.text.isNotEmpty) {
       messages.add(
         Message(
@@ -149,5 +151,7 @@ class _ChatBoxState extends State<ChatBox> {
         );
       });
     }
+    List<dynamic>? players = await serverApi.get('/players');
+    print(players);
   }
 }

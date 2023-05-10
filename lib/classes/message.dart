@@ -1,20 +1,23 @@
-import 'package:distributed_computing_project/classes/player.dart';
-
 import '../config.dart';
 
 class Message {
-  Player from;
-  Player? to;
+  String id;
+  String chatId;
+  String from;
+  String? to;
   bool private;
   String content;
+  DateTime time = DateTime.now();
   bool outgoingMessage = true;
 
   Message({
+    required this.id,
+    required this.chatId,
     required this.from,
     this.to,
     required this.private,
     required this.content
   }) {
-    outgoingMessage = from.playerID == Config.currentPlayer.playerID;
+    outgoingMessage = from == Config.currentPlayer.playerID;
   }
 }

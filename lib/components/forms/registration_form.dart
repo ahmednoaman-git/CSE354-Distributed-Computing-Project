@@ -12,7 +12,6 @@ class RegistrationForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ApiClient serverApi = ApiClient('localhost:3000');
     TextEditingController usernameController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
     TextEditingController passwordConfirmController = TextEditingController();
@@ -68,7 +67,7 @@ class RegistrationForm extends StatelessWidget {
                       passwordController.text == passwordConfirmController.text &&
                       (usernameController.text.isNotEmpty && passwordController.text.isNotEmpty && passwordConfirmController.text.isNotEmpty && imageUrlController.text.isNotEmpty)
                     ) {
-                      response = await serverApi.addPlayer(_createPlayer(
+                      response = await ApiClient.addPlayer(_createPlayer(
                           usernameController.text,
                           PasswordHasher.hashPassword(passwordController.text),
                           imageUrlController.text

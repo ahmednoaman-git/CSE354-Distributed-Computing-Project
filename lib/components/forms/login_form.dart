@@ -3,8 +3,8 @@ import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/classes/player.dart';
 import 'package:distributed_computing_project/components/forms/form_text_field.dart';
 import 'package:distributed_computing_project/config.dart';
-import 'package:distributed_computing_project/pages/home_page.dart';
 import 'package:distributed_computing_project/pages/registration_page.dart';
+import 'package:distributed_computing_project/pages/sessions_display_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../backend/api/api_client.dart';
@@ -64,7 +64,7 @@ class LoginForm extends StatelessWidget {
                     if (validatedPlayer != null) {
                       Config.currentPlayer = validatedPlayer;
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const HomePage())
+                        MaterialPageRoute(builder: (context) => const SessionsDisplayPage())
                       );
                     } else {
                       //TODO:UI FOR INVALID
@@ -111,8 +111,7 @@ class LoginForm extends StatelessWidget {
   }
 
   Future<Player?> _validateCredentials(String username, String password) async {
-    ApiClient serverApi = ApiClient('localhost:3000');
-    List<Player> players = await serverApi.getPlayers();
+    List<Player> players = await ApiClient.getPlayers();
     print(players);
     for (Player player in players) {
       print(player.password);

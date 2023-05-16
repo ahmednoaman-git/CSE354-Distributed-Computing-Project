@@ -3,6 +3,7 @@ import 'package:distributed_computing_project/backend/password_hasher.dart';
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/components/forms/counterbutton/counter_button.dart';
 import 'package:distributed_computing_project/components/forms/form_text_field.dart';
+import 'package:distributed_computing_project/pages/sessions_display_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -17,24 +18,23 @@ class SessionCreationForm extends StatefulWidget {
 }
 
 class _SessionCreationFormState extends State<SessionCreationForm> {
+  TextEditingController sessionNameController = TextEditingController();
+  TextEditingController sessionPasswordController = TextEditingController();
+  CounterButtonController numberOfPlayersController = CounterButtonController();
+  CounterButtonController numberOfLapsController = CounterButtonController();
+
   bool _private = false;
+  final double formHeight = 600;
+  final double formWidth = 600;
+  final double topBarHeight = 20;
 
   @override
   Widget build(BuildContext context) {
-    const int formHeight = 600;
-    const int formWidth = 600;
-    const int topBarHeight = 20;
 
-    TextEditingController sessionNameController = TextEditingController();
-    TextEditingController sessionPasswordController = TextEditingController();
-    CounterButtonController numberOfPlayersController = CounterButtonController();
-    CounterButtonController numberOfLapsController = CounterButtonController();
-
-
-
+    /// - MAIN CONTAINER - ///
     return Container(
-      width: 600,
-      height: 600,
+      width: formWidth,
+      height: formHeight,
       decoration: BoxDecoration(
         color: AppColors.containerBackground,
         borderRadius: BorderRadius.circular(20)
@@ -42,36 +42,47 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+
+          /// - TOP BAR - ///
           Container(
-            height: topBarHeight.toDouble(),
+            height: topBarHeight,
             decoration: const BoxDecoration(
                 color: AppColors.accent,
                 borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))
             ),
           ),
+
+          /// - FORM CONTAINER - ///
           Container(
             padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 70),
             height: (formHeight - topBarHeight).toDouble(),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 const CircleAvatar(
-                    backgroundColor: AppColors.accent,
-                    radius: 40,
-                    child: Icon(Icons.list_alt_outlined, color: AppColors.highlight, size: 35,)
+                  backgroundColor: AppColors.accent,
+                  radius: 40,
+                  child: Icon(Icons.list_alt_outlined, color: AppColors.highlight, size: 35,)
                 ),
+
                 const Text(
                   'Create a new session',
                   style: TextStyle(
-                      color: AppColors.highlight,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold
+                    color: AppColors.highlight,
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold
                   ),
                 ),
+
                 FormTextField(controller: sessionNameController, icon: Icons.drive_file_rename_outline, obscureText: false, hintText: 'Session name').get(),
+
+                /// - PRIVATE SETTINGS - ///
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+
+                    /// - TOGGLE SWITCH - ///
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
                       width: formWidth / 4,
@@ -82,6 +93,7 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
+
                           const Text(
                             'Private',
                             style: TextStyle(
@@ -89,6 +101,7 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                               fontSize: 16,
                             ),
                           ),
+
                           CupertinoSwitch(
                             value: _private,
                             activeColor: AppColors.accent,
@@ -100,12 +113,16 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                         ],
                       ),
                     ),
+
+                    /// - PASSWORD INPUT - ///
                     SizedBox(
                       width: formWidth - (formWidth/1.9),
                       child: FormTextField(controller: sessionPasswordController, icon: Icons.lock, obscureText: true, hintText: 'Session Password').get()
                     ),
                   ],
                 ),
+
+                /// - GAME SETTINGS - ///
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -113,6 +130,8 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                     CounterButton(controller: numberOfLapsController, buttonName: 'Number of Laps', minimum: 1, maximum: 10)
                   ],
                 ),
+
+                /// - CREATE SESSION BUTTON - ///
                 ElevatedButton(
                   onPressed: () async {
                     if (sessionNameController.text.isNotEmpty && (!_private || (_private && sessionPasswordController.text.isNotEmpty))) {
@@ -123,7 +142,9 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                         numberOfLapsController.count
                       );
                       int response = await ApiClient.addSession(session);
-                      print(response);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const SessionsDisplayPage())
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -138,6 +159,7 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+
               ],
             ),
           ),

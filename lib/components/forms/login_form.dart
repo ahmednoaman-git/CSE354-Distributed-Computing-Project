@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:distributed_computing_project/backend/password_hasher.dart';
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/classes/player.dart';
@@ -10,19 +12,21 @@ import 'package:flutter/material.dart';
 import '../../backend/api/api_client.dart';
 
 class LoginForm extends StatelessWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  final double formWidth = 600;
+  final double formHeight = 600;
+  final double topBarHeight = 20;
+
+  LoginForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    const int formWidth = 600;
-    const int formHeight = 600;
-    const int topBarHeight = 20;
+    /// - MAIN CONTAINER - ///
     return Container(
-      width: 600,
-      height: 600,
+      width: formWidth,
+      height: formHeight,
       decoration: BoxDecoration(
         color: AppColors.containerBackground,
         borderRadius: BorderRadius.circular(20),
@@ -30,24 +34,30 @@ class LoginForm extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+
+          /// - TOP BAR - ///
           Container(
-            height: 20,
+            height: topBarHeight,
             decoration: const BoxDecoration(
               color: AppColors.accent,
               borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))
             ),
           ),
+
+          /// - FORM CONTAINER - ///
           Container(
-            padding: EdgeInsets.symmetric(vertical: 30, horizontal: 70),
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 70),
             height: (formHeight - topBarHeight).toDouble(),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 const CircleAvatar(
                   backgroundColor: AppColors.accent,
                   radius: 40,
                   child: Icon(Icons.person, color: AppColors.highlight, size: 35,)
                 ),
+
                 const Text(
                   'Welcome',
                   style: TextStyle(
@@ -56,8 +66,11 @@ class LoginForm extends StatelessWidget {
                     fontWeight: FontWeight.bold
                   ),
                 ),
+
                 FormTextField(controller: usernameController, icon: Icons.person, obscureText: false, hintText: 'Username').get(),
                 FormTextField(controller: passwordController, icon: Icons.lock, obscureText: true, hintText: 'Password').get(),
+
+                /// - LOGIN BUTTON - ///
                 ElevatedButton(
                   onPressed: () async {
                     Player? validatedPlayer = await _validateCredentials(usernameController.text, passwordController.text);
@@ -83,6 +96,8 @@ class LoginForm extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
+
+                /// - REGISTRATION LINK - ///
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -112,10 +127,7 @@ class LoginForm extends StatelessWidget {
 
   Future<Player?> _validateCredentials(String username, String password) async {
     List<Player> players = await ApiClient.getPlayers();
-    print(players);
     for (Player player in players) {
-      print(player.password);
-      print(PasswordHasher.hashPassword(password));
       if (player.userName == username && player.password == PasswordHasher.hashPassword(password)) {
         return player;
       }

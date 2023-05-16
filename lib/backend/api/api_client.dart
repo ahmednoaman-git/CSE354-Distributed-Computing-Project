@@ -116,11 +116,9 @@ class ApiClient {
   
   static Future<String> getChatId(String sessionId) async {
     final Uri url = Uri.http(baseUrl, '/chat');
-    print(sessionId);
     try {
       final http.Response response = await http.get(url, headers: {'sessionID': sessionId});
       if (response.statusCode == 200) {
-        print('BODY: ${json.decode(response.body)}');
         return json.decode(response.body);
       }
     } catch (error) {

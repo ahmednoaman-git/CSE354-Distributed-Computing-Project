@@ -2,13 +2,19 @@ const express = require('express');
 const { Pool, Query } = require('pg');
 const cors = require('cors')
 const bodyParser = require('body-parser');
+const socketIO = require('socket.io');
+
 
 const app = express();
 const port = 3000;
 
-app.use(cors())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
+server = app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
 
 const pool = new Pool({
   user: 'ahmed_noaman',
@@ -18,6 +24,45 @@ const pool = new Pool({
   port: 5432,
 });
 
+const io = socketIO(server);
+
+async function initializeChatRooms() {
+  try {
+    const { rows } = await pool.query('SELECT "chatID" FROM game_schema."Chats"');
+    console.log(rows);
+    rows.forEach((chat) => {
+      const chatChannel = io.of(`/${chat.chatID}`);
+      console.log(chat.chatID)
+      chatChannel.on('connection', (socket) => {
+        console.log(`New client connected to chat channel ${chat.chatID}`);
+        socket.on('message', (message) => {
+          chatChannel.emit('message', message);
+        });
+        socket.on('disconnect', () => {
+          console.log(`Client disconnected from chat channel ${chat.chatID}`);
+        });
+      });
+    });
+    
+    console.log('Chat rooms initialized');
+  } catch (error) {
+    console.error('Error initializing chat rooms:', error);
+  }
+}
+
+io.on('connection', (player) => {
+  console.log(`Player connected from @ ${player.id}`)
+
+  player.on('join', (room) => {
+    player.join(room);
+    console.log(`Player joined room: ChatID - ${room}`);
+  })
+
+  player.on('message', (data) => {
+    data = JSON.parse(data);
+    player.in(data.chatID).emit('message', JSON.stringify(data));
+  })
+})
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -26,14 +71,12 @@ app.get('/', (req, res) => {
 app.get('/players', async (req, res) => {
   const { rows } = await pool.query('SELECT * FROM game_schema."Players"');
   res.json(rows);
-  console.log('hello')
-  console.log(req.body)
 });
 
 app.get('/sessions', async (req, res) => {
   const active = req.headers.active
-  console.log(active)
   const activeQueryClause = active ? 'WHERE array_length("playersID", 1) IS NULL' : ''
+  
   const { rows } = await pool.query(`
     SELECT * 
     FROM game_schema."Sessions" 
@@ -44,7 +87,7 @@ app.get('/sessions', async (req, res) => {
 
 app.get('/chat', async (req, res) => {
   const sessionID = req.headers.sessionid;
-  console.log(sessionID)
+
   const { rows: chatRows } = await pool.query(`
     SELECT *
     FROM game_schema."Chats"
@@ -55,27 +98,23 @@ app.get('/chat', async (req, res) => {
     return res.status(404).json({ error: 'Chat not found' });
   }
 
-  res.json(chatRows[0].chatID)
-  console.log(chatRows[0].chatID)
+  res.json(chatRows[0].chatID);
 })
-
 
 app.get('/messages', async (req, res) => {
   const sessionID = req.headers.sessionid;
-  console.log(sessionID)
+
   const { rows: chatRows } = await pool.query(`
     SELECT *
     FROM game_schema."Chats"
     WHERE "sessionID" = '${sessionID}'
   `);
-  console.log(chatRows)
 
   if (chatRows.length === 0) {
     return res.status(404).json({ error: 'Chat not found' });
   }
 
   const chat = chatRows[0];
-  console.log(chat)
   const messagesID = chat.messagesID;
 
   const { rows: messageRows } = await pool.query(`
@@ -85,11 +124,11 @@ app.get('/messages', async (req, res) => {
   `, [messagesID]);
 
   res.json(messageRows);
-  console.log(messageRows)
 });
 
 app.post('/addplayer', async (req, res) => {
   const { playerID, username, password, imageUrl } = req.body
+
   const query = `
     INSERT INTO 
       game_schema."Players" 
@@ -101,6 +140,7 @@ app.post('/addplayer', async (req, res) => {
 
 app.post('/addsession', async (req, res) => {
   const {sessionID, start, sessionName, private, password, numberOfPlayers, numberOfLaps, chatID} = req.body
+
   const query = `
     INSERT INTO
       game_schema."Sessions"
@@ -114,10 +154,24 @@ app.post('/addsession', async (req, res) => {
     VALUES
       ('${chatID}', '${sessionID}', array[]::uuid[]);
   `
-  console.log(query)
+
   try {
     await pool.query(query);
     res.status(200).send('Session added successfully');
+
+    const chatChannel = io.of(`/${chatID}`);
+    chatChannel.on('connection', (socket) => {
+      console.log(`New player connected to ${chatID}`);
+
+      socket.on('message', (message) => {
+        console.log(`Recieved a message on ${chatID}`);
+        chatChannel.emit('message', message);
+      })
+
+      socket.on('disconnect', () => {
+        console.log(`A player disconnected from channel ${chatID}`);
+      })
+    })
   } catch (error) {
     console.error(error);
     res.status(500).send('Error adding session');
@@ -141,8 +195,6 @@ app.post('/addmessage', async (req, res) => {
     WHERE "chatID" = '${chatID}';
   `
 
-  console.log(query)
-
   try {
     await pool.query(query);
     res.status(200).send('Message added successfully');
@@ -151,7 +203,3 @@ app.post('/addmessage', async (req, res) => {
     res.status(500).send('Error adding message');
   }
 })
-
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});

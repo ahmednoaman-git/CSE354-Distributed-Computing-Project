@@ -34,6 +34,7 @@ dependencies:
   uuid: ^3.0.7
   crypto: ^3.0.3
   socket_io_client: ^2.0.0
+  flutter_unity_widget: ^2022.2.0
 
 
   # The following adds the Cupertino Icons font to your application.

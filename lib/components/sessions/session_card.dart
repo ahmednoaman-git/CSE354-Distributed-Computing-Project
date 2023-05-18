@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class SessionCard extends StatelessWidget {
   Session session;
   Map<String, Color> activityColors = {'open': AppColors.accentLighter,'running': AppColors.sessionRunningAccent, 'closed': AppColors.sessionClosedAccent};
+  
   SessionCard({Key? key, required this.session}) : super(key: key);
 
   @override

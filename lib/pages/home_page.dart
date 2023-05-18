@@ -1,4 +1,4 @@
-import 'package:distributed_computing_project/components/chatbox/chatbox.dart';
+import 'package:distributed_computing_project/components/game/game_view.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           leading: const Icon(Icons.menu),
         ),
-        body: const Center(child: ChatBox()),
+        body: const Center(child: GameView()),
       ),
     );
   }

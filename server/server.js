@@ -24,45 +24,7 @@ const pool = new Pool({
   port: 5432,
 });
 
-const io = socketIO(server);
 
-async function initializeChatRooms() {
-  try {
-    const { rows } = await pool.query('SELECT "chatID" FROM game_schema."Chats"');
-    console.log(rows);
-    rows.forEach((chat) => {
-      const chatChannel = io.of(`/${chat.chatID}`);
-      console.log(chat.chatID)
-      chatChannel.on('connection', (socket) => {
-        console.log(`New client connected to chat channel ${chat.chatID}`);
-        socket.on('message', (message) => {
-          chatChannel.emit('message', message);
-        });
-        socket.on('disconnect', () => {
-          console.log(`Client disconnected from chat channel ${chat.chatID}`);
-        });
-      });
-    });
-    
-    console.log('Chat rooms initialized');
-  } catch (error) {
-    console.error('Error initializing chat rooms:', error);
-  }
-}
-
-io.on('connection', (player) => {
-  console.log(`Player connected from @ ${player.id}`)
-
-  player.on('join', (room) => {
-    player.join(room);
-    console.log(`Player joined room: ChatID - ${room}`);
-  })
-
-  player.on('message', (data) => {
-    data = JSON.parse(data);
-    player.in(data.chatID).emit('message', JSON.stringify(data));
-  })
-})
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
@@ -73,16 +35,51 @@ app.get('/players', async (req, res) => {
   res.json(rows);
 });
 
+app.get('/player', async (req, res) => {
+  const playerID = req.headers.playerid;
+  const {rows} = await pool.query(`
+    SELECT * FROM game_schema."Players"
+    WHERE "playerID" = '${playerID}'
+  `)
+
+  if (rows.length === 0) {
+    return res.status(404)
+  }
+
+  res.json(rows[0])
+})
+
 app.get('/sessions', async (req, res) => {
   const active = req.headers.active
   const activeQueryClause = active ? 'WHERE array_length("playersID", 1) IS NULL' : ''
   
   const { rows } = await pool.query(`
     SELECT * 
-    FROM game_schema."Sessions" 
-    ${activeQueryClause};
+    FROM game_schema."Sessions"
   `)
-  res.json(rows)
+
+  for (let i = 0; i < rows.length; i++) {
+    if (sessions[rows[i]['sessionID']] !== undefined) {
+      rows[i]['playersID'] = sessions[rows[i]['sessionID']]['players'];
+    } 
+  }
+  
+  res.json(rows);
+});
+
+app.get('/session', async (req, res) => {
+  const sessionID = req.headers.sessionid;
+
+  const { rowCount, rows } = await pool.query(`
+    SELECT *
+    FROM game_schema."Sessions"
+    WHERE "sessionID" = '${sessionID}';
+  `)
+
+  if (rowCount == 1) {
+    res.json(rows[0]);
+  }
+  
 });
 
 app.get('/chat', async (req, res) => {
@@ -127,7 +124,7 @@ app.get('/messages', async (req, res) => {
 });
 
 app.post('/addplayer', async (req, res) => {
-  const { playerID, username, password, imageUrl } = req.body
+  const { playerID, username, password, imageUrl } = req.body // {"key1": "value1"}
 
   const query = `
     INSERT INTO 

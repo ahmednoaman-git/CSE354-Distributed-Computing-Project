@@ -19,7 +19,7 @@ class _SessionsViewState extends State<SessionsView> {
   @override
   void initState() {
     super.initState();
-    _sessionsFuture = ApiClient.getSessions(true);
+    _sessionsFuture = ApiClient.getSessions();
   }
 
   @override
@@ -42,7 +42,7 @@ class _SessionsViewState extends State<SessionsView> {
               width: viewWidth.toDouble(),
               height: viewHeight.toDouble(),
               decoration: BoxDecoration(
-                color: AppColors.containerBackground,
+                color: AppColors.containerBackgroundLighter,
                 borderRadius: BorderRadius.circular(20)
               ),
               child: Center(

@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/config.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +33,7 @@ class _PlayersViewState extends State<PlayersView> {
         children: widget.players.map((player) {
           return Container(
             padding: const EdgeInsets.all(4),
-            margin: widget.players.length != 4 ? EdgeInsets.only(top: 6, left: 6, right: 6) : EdgeInsets.symmetric(horizontal: 6),
+            margin: widget.players.length != 4 ? const EdgeInsets.only(top: 6, left: 6, right: 6) : const EdgeInsets.symmetric(horizontal: 6),
             height: widget.height! / 4.5,
             decoration: BoxDecoration(
               color: AppColors.containerBackgroundLighter,
@@ -90,7 +92,7 @@ class _PlayersViewState extends State<PlayersView> {
                         color: AppColors.highlight,
                         borderRadius: BorderRadius.circular(10)
                       ),
-                      child: Image.network(widget.playerStates[player.playerID]['car'], width: 40, height: 40)
+                      child: Image.asset(widget.playerStates[player.playerID]?['car'] ?? 'Assets/Cars/Black/car_black_1.png', width: 40, height: 40)
                     ),
 
                     const SizedBox(width: 10),

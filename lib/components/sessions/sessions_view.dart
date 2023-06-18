@@ -16,6 +16,11 @@ class _SessionsViewState extends State<SessionsView> {
   Future<List<Session>> _sessionsFuture = Future(() => []);
   List<Session> _sessions = [];
 
+
+  final int _viewWidth = 520;
+  final int _viewHeight = 800;
+  final int _topBarHeight = 20;
+
   @override
   void initState() {
     super.initState();
@@ -24,23 +29,21 @@ class _SessionsViewState extends State<SessionsView> {
 
   @override
   Widget build(BuildContext context) {
-    const int viewWidth = 600;
-    const int viewHeight = 800;
-    const int topBarHeight = 20;
+
 
     return FutureBuilder<List<Session>>(
       future: _sessionsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return Center(child: SizedBox(width: _viewWidth/6, height: _viewWidth/6, child: const CircularProgressIndicator(color: AppColors.accent)));
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
           _sessions = snapshot.data ?? [];
           return Center(
             child: Container(
-              width: viewWidth.toDouble(),
-              height: viewHeight.toDouble(),
+              padding: EdgeInsets.all(30),
+              width: _viewWidth.toDouble(),
               decoration: BoxDecoration(
                 color: AppColors.containerBackgroundLighter,
                 borderRadius: BorderRadius.circular(20)

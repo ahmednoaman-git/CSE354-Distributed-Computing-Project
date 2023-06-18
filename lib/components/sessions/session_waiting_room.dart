@@ -21,7 +21,7 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
   final IO.Socket _socket = Config.socket;
 
   final double _viewWidth = 800;
-  final double _viewHeight = 700;
+  final double _viewHeight = 650;
 
   Map<String, Map<String, dynamic>> _playerStates = {};
 
@@ -67,7 +67,6 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
 
   @override
   Widget build(BuildContext context) {
-    print(GoRouter.of(context).location);
     return FutureBuilder<List<Player>>(
       future: _playersFuture,
       builder: (context, snapshot) {
@@ -85,8 +84,6 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
           return Text('Error: ${snapshot.error}');
         } else {
           _players = snapshot.data ?? [];
-
-          print(GoRouter.of(context).location);
 
           return Stack(
             children: [
@@ -215,8 +212,8 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
               ),
 
               Positioned(
-                left: _viewWidth / 2 - 46,
-                top: _viewHeight * 0.88,
+                left: _viewWidth / 2 - 41,
+                top: _viewHeight * 0.886,
                 child: InkWell(
                   splashColor: Colors.transparent,
                   highlightColor: Colors.transparent,
@@ -260,10 +257,10 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
                   },
 
                   child: CircleAvatar(
-                    radius: 46,
+                    radius: 41,
                     backgroundColor: AppColors.containerBackgroundLighter,
                     child: CircleAvatar(
-                      radius: 35,
+                      radius: 30,
                       backgroundColor: _inkWellColor,
                       child: Icon(Config.currentPlayer.playerID == _leaderID ? Icons.play_arrow :   _inkWellIcon, color: AppColors.highlight, size: 30)
                     ),
@@ -278,6 +275,7 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
   }
 
   void _displayPlayers() {
+    print('Updating players');
     setState(() {
       _leaderID = Config.currentSessionLeader;
       _playersFuture = Config.currentSession.getPlayers();
@@ -299,7 +297,9 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
       }
     }
   }
+
   void _startGame() {
+    Config.currentSessionPlayers = _players;
     context.go('/game');
   }
 }

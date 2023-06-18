@@ -1,6 +1,8 @@
 import 'package:distributed_computing_project/components/game/game_view.dart';
 import 'package:flutter/material.dart';
 
+import '../config.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -13,7 +15,7 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           leading: const Icon(Icons.menu),
         ),
-        body: const Center(child: GameView()),
+        body: Center(child: GameView(gameSettings: Config.gameSettings)),
       ),
     );
   }

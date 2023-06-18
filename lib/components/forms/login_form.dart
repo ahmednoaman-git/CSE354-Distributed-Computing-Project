@@ -5,9 +5,8 @@ import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/classes/player.dart';
 import 'package:distributed_computing_project/components/forms/form_text_field.dart';
 import 'package:distributed_computing_project/config.dart';
-import 'package:distributed_computing_project/pages/registration_page.dart';
-import 'package:distributed_computing_project/pages/sessions_display_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../backend/api/api_client.dart';
 
@@ -28,7 +27,7 @@ class LoginForm extends StatelessWidget {
       width: formWidth,
       height: formHeight,
       decoration: BoxDecoration(
-        color: AppColors.containerBackground,
+        color: AppColors.containerBackgroundLighter,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -76,9 +75,9 @@ class LoginForm extends StatelessWidget {
                     Player? validatedPlayer = await _validateCredentials(usernameController.text, passwordController.text);
                     if (validatedPlayer != null) {
                       Config.currentPlayer = validatedPlayer;
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => const SessionsDisplayPage())
-                      );
+                      if (context.mounted) {
+                        context.go('/sessions');
+                      }
                     } else {
                       //TODO:UI FOR INVALID
                       print('invalid credentials');
@@ -107,9 +106,7 @@ class LoginForm extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const RegistrationPage())
-                        );
+                        context.go('/register');
                       },
                       child: const Text(
                       'Sign Up',

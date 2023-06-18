@@ -54,6 +54,29 @@ class ApiClient {
     return[];
   }
 
+  static Future<Player> getPlayer(String playerID) async {
+    final Uri url = Uri.http(baseUrl, '/player');
+
+    try {
+      final http.Response response = await http.get(url, headers: {'playerID': playerID});
+      if (response.statusCode == 200) {
+        dynamic decodedResponse = json.decode(response.body);
+        Player player = Player(
+          playerID: decodedResponse['playerID'],
+          userName: decodedResponse['username'],
+          password: decodedResponse['password'],
+          connected: decodedResponse['connected'] == true,
+          lastSeen: decodedResponse['lastSeen'],
+          imageUrl: decodedResponse['imageUrl']
+        );
+        return player;
+      }
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+    return Player(playerID: '', userName: 'Undefined', password: '', imageUrl: 'https://sbcf.fr/wp-content/uploads/2018/03/sbcf-default-avatar.png');
+  }
+
   static Future<int> addSession(Session session) async {
     final Uri url = Uri.http(baseUrl, '/addSession');
     final Map<String, String> headers = {
@@ -77,12 +100,44 @@ class ApiClient {
     final http.Response response = await http.post(url, headers: headers, body: body);
     return response.statusCode;
   }
+
+  static Future<Session?> getSession(String sessionID) async {
+    final Uri url = Uri.http(baseUrl, '/session');
+
+    try {
+      final http.Response response = await http.get(url, headers: {'sessionid': sessionID});
+      final dynamic data = jsonDecode(response.body);
+
+      Session session = Session(
+        id: data['sessionID'],
+        start: DateTime.parse(data['start']),
+        sessionName: data['sessionName'],
+        private: data['private'],
+        numberOfPlayers: data['numberOfPlayers'],
+        numberOfLaps: data['numberOfLaps'],
+        state: data['state']
+      );
+
+      session.playersId = (data['playersID'] as List).map((item) => item as String).toList();
+      session.end = data['end'] != null ?  DateTime.parse(data['end']) : null;
+      session.winnerId = data['winnerID'];
+
+      if (session.private) {
+        session.password = data['password'];
+      }
+
+      return session;
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+    return null;
+  }
   
-  static Future<List<Session>> getSessions(bool active) async {
+  static Future<List<Session>> getSessions() async {
     final Uri url = Uri.http(baseUrl, '/sessions');
     
     try {
-      final http.Response response = await http.get(url, headers: {'active': active.toString()});
+      final http.Response response = await http.get(url);
       if (response.statusCode == 200) {
         List<Session> sessions = [];
         List<dynamic> responseData = json.decode(response.body);
@@ -95,12 +150,11 @@ class ApiClient {
             numberOfPlayers: row['numberOfPlayers'],
             numberOfLaps: row['numberOfLaps'],
             state: row['state']
+
           );
-          if (!active) {
-            session.playersId = (row['playersID'] as List).map((item) => item as String).toList();
-            session.end = row['end'] != null ?  DateTime.parse(row['end']) : null;
-            session.winnerId = row['winnerID'];
-          }
+          session.playersId = (row['playersID'] as List).map((item) => item as String).toList();
+          session.end = row['end'] != null ?  DateTime.parse(row['end']) : null;
+          session.winnerId = row['winnerID'];
           if (session.private) {
             session.password = row['password'];
           }
@@ -129,6 +183,7 @@ class ApiClient {
   }
 
   static Future<List<Message>> getMessagesBySession(String sessionId) async {
+    print('API called to get messages');
     final Uri url = Uri.http(baseUrl, '/messages');
     
     try {
@@ -143,12 +198,16 @@ class ApiClient {
             from: row['from'],
             private: row['private'],
             content: row['content'],
+            username: row['username'],
+            imageUrl: row['imageUrl']
           );
           message.to = message.private ? row['to'] : null;
           message.time = DateTime.parse(row['time']);
 
           messages.add(message);
         }
+        print('API sucess');
+        print(messages);
         return messages;
       }
     } catch (error) {

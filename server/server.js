@@ -89,6 +89,8 @@ io.on('connection', (player) => {
 
   player.on('message', (data) => {
     data = JSON.parse(data);
+    console.log('\nMessage recieved successfully.\n- Message:')
+    console.log(data);
     player.in(data.chatID).emit('message', JSON.stringify(data));
   })
 
@@ -230,7 +232,6 @@ app.get('/messages', async (req, res) => {
     FROM game_schema."Chats"
     WHERE "sessionID" = '${sessionID}'
   `);
-
   if (chatRows.length === 0) {
     return res.status(404).json({ error: 'Chat not found' });
   }
@@ -239,9 +240,10 @@ app.get('/messages', async (req, res) => {
   const messagesID = chat.messagesID;
 
   const { rows: messageRows } = await pool.query(`
-    SELECT *
-    FROM game_schema."Messages"
-    WHERE "messageID" = ANY($1)
+    SELECT m.*, p.username, p."imageUrl"
+    FROM game_schema."Messages" m
+    JOIN game_schema."Players" p ON m.from = p."playerID"
+    WHERE m."messageID" = ANY($1);
   `, [messagesID]);
 
   res.json(messageRows);

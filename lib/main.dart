@@ -1,3 +1,4 @@
+import 'package:distributed_computing_project/pages/game_page.dart';
 import 'package:distributed_computing_project/pages/home_page.dart';
 import 'package:distributed_computing_project/pages/login_page.dart';
 import 'package:distributed_computing_project/pages/registration_page.dart';
@@ -13,9 +14,15 @@ void main() {
 
 class AppRoot extends StatelessWidget {
   final GoRouter _router = GoRouter(
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: '/',
+        builder: (context, state) => const HomePage()
+      ),
+
+      GoRoute(
+        path: '/login',
         builder: (context, state) => const LogInPage()
       ),
 
@@ -42,7 +49,7 @@ class AppRoot extends StatelessWidget {
 
       GoRoute(
         path: '/game',
-        builder: (context, state) => const HomePage()
+        builder: (context, state) => const GamePage()
       )
     ]
   );
@@ -52,6 +59,7 @@ class AppRoot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Distributed Computing',
       routerConfig: _router,
     );

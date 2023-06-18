@@ -74,9 +74,10 @@ class LoginForm extends StatelessWidget {
                   onPressed: () async {
                     Player? validatedPlayer = await _validateCredentials(usernameController.text, passwordController.text);
                     if (validatedPlayer != null) {
+                      Config.isLoggedIn = true;
                       Config.currentPlayer = validatedPlayer;
                       if (context.mounted) {
-                        context.go('/sessions');
+                        context.go('/');
                       }
                     } else {
                       //TODO:UI FOR INVALID

@@ -5,11 +5,13 @@ class AppColors {
   static const Color appBackground = Color(0xFF090909);
   static const Color containerBackground = Color(0xFF121212);
   static const Color containerBackgroundLighter = Color(0xFF181818);
+  static const Color highlightDarker2 = Color(0xFF505b66);
   static const Color highlightDarkest = Color(0xFF535353);
   static const Color highlightDarker = Color(0xFFB3B3B3);
   static const Color highlight = Color(0xFFFFFFFF);
   static const Color accentLighter = Color(0xFF1ED760);
   static const Color accent = Color(0xFF1AA04A);
+  static const Color accent2 = Color(0xFF0091FB);
   static const Color sessionClosedAccent = Color(0xFFA01A39);
   static const Color sessionRunningAccent = Color(0xFF4A7B9E);
 

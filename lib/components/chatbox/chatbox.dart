@@ -6,7 +6,6 @@ import 'package:distributed_computing_project/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 
@@ -14,7 +13,8 @@ import '../../backend/api/api_client.dart';
 import '../../classes/message.dart';
 
 class ChatBox extends StatefulWidget {
-  const ChatBox({Key? key}) : super(key: key);
+  final double height;
+  const ChatBox({Key? key, required this.height}) : super(key: key);
 
   @override
   State<ChatBox> createState() => _ChatBoxState();
@@ -29,12 +29,13 @@ class _ChatBoxState extends State<ChatBox> {
   ScrollController scrollController = ScrollController();
 
   final double chatBoxWidth = 350;
-  final double chatBoxHeight = 500;
+  double chatBoxHeight = 500;
   final double inputHeight = 65;
 
   @override
   void initState() {
     super.initState();
+    chatBoxHeight = widget.height;
 
     _messagesFuture = ApiClient.getMessagesBySession(Config.currentSession.id);
 
@@ -43,8 +44,6 @@ class _ChatBoxState extends State<ChatBox> {
 
   @override
   Widget build(BuildContext context) {
-    print(GoRouter.of(context).location);
-
     return FutureBuilder<List<Message>>(
       future: _messagesFuture,
       builder: (context, snapshot) {
@@ -55,7 +54,6 @@ class _ChatBoxState extends State<ChatBox> {
         } else {
           _messages = snapshot.data ?? [];
 
-          print(GoRouter.of(context).location);
           /// - PARENT CONTAINER - ///
           return Container(
             width: chatBoxWidth,
@@ -178,7 +176,9 @@ class _ChatBoxState extends State<ChatBox> {
         chatId: Config.currentChatId,
         from: Config.currentPlayer.playerID,
         private: false,
-        content: messageInputController.text
+        content: messageInputController.text,
+        username: Config.currentPlayer.userName,
+        imageUrl: Config.currentPlayer.imageUrl
       );
 
       _displayMessage(message);
@@ -192,7 +192,9 @@ class _ChatBoxState extends State<ChatBox> {
           "to": ${message.to == null ? null : '"${message.to}"'},
           "private": ${message.private},
           "content": "${message.content}",
-          "time": "${message.time}"
+          "time": "${message.time}",
+          "username": "${Config.currentPlayer.userName}",
+          "imageUrl": "${Config.currentPlayer.imageUrl}"
         }
       ''');
       ApiClient.addMessage(message);
@@ -211,32 +213,4 @@ class _ChatBoxState extends State<ChatBox> {
       });
     });
   }
-
-  // IO.Socket _initSocket(IO.Socket socket) {
-  //   socket.on('connect', (_) {
-  //     debugPrint('Flutter player connected on ${Config.currentChatId}');
-  //     socket.emit('joinChat', Config.currentChatId);
-  //   });
-  //
-  //   socket.on('message', (data) {
-  //     Map<String, dynamic> messageData = jsonDecode(data);
-  //     Message message = Message(
-  //         id: messageData['messageID'],
-  //         chatId: messageData['chatID'],
-  //         from: messageData['from'],
-  //         to: messageData['to'],
-  //         private: messageData['private'],
-  //         content: messageData['content']
-  //     );
-  //     message.time = DateTime.parse(messageData['time']);
-  //
-  //     _displayMessage(message);
-  //   });
-  //
-  //   socket.on('res', (data) {
-  //     debugPrint(data);
-  //   });
-  //
-  //   return socket;
-  // }
 }

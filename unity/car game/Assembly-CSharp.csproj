@@ -38,17 +38,10 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\CarPhysics.cs" />
      <Compile Include="Assets\FlutterUnityIntegration\Demo\SceneLoader.cs" />
-     <Compile Include="Assets\Scripts\WheelTrailHandler.cs" />
      <Compile Include="Assets\FlutterUnityIntegration\Demo\GameManager.cs" />
-     <Compile Include="Assets\Scripts\CarLapCounter.cs" />
-     <Compile Include="Assets\Scripts\SceneController.cs" />
-     <Compile Include="Assets\Scripts\ExternalCarPhysics.cs" />
      <Compile Include="Assets\FlutterUnityIntegration\UnityMessageManager.cs" />
      <Compile Include="Assets\FlutterUnityIntegration\NativeAPI.cs" />
      <Compile Include="Assets\FlutterUnityIntegration\Demo\Rotate.cs" />
-     <Compile Include="Assets\Scripts\CheckPoint.cs" />
-     <Compile Include="Assets\Scripts\PositionHandler.cs" />
-     <Compile Include="Assets\Scripts\CarState.cs" />
      <Compile Include="Assets\Scripts\CarInput.cs" />
      <Compile Include="Assets\FlutterUnityIntegration\SingletonMonoBehaviour.cs" />
      <None Include="Assets\FlutterUnityIntegration\JsonDotNet\link.xml" />

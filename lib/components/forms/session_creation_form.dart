@@ -36,7 +36,7 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
       width: formWidth,
       height: formHeight,
       decoration: BoxDecoration(
-        color: AppColors.containerBackground,
+        color: AppColors.containerBackgroundLighter,
         borderRadius: BorderRadius.circular(20)
       ),
       child: Column(
@@ -87,7 +87,7 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
                       width: formWidth / 4,
                       decoration: BoxDecoration(
-                        color: AppColors.containerBackgroundDarker,
+                        color: AppColors.containerBackground,
                         borderRadius: BorderRadius.circular(20)
                       ),
                       child: Row(
@@ -105,7 +105,7 @@ class _SessionCreationFormState extends State<SessionCreationForm> {
                           CupertinoSwitch(
                             value: _private,
                             activeColor: AppColors.accent,
-                            trackColor: AppColors.containerBackgroundLighter,
+                            trackColor: AppColors.containerBackground,
                             onChanged: (value) {
                               setState(() => _private = value);
                             }

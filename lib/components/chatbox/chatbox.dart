@@ -1,13 +1,12 @@
 // ignore_for_file: depend_on_referenced_packages, library_prefixes
 
-import 'dart:convert';
-
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/components/chatbox/messagebubble.dart';
 import 'package:distributed_computing_project/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 
@@ -24,7 +23,7 @@ class ChatBox extends StatefulWidget {
 class _ChatBoxState extends State<ChatBox> {
   Future<List<Message>> _messagesFuture = Future(() => []);
   List<Message> _messages = [];
-  IO.Socket socket = IO.io('http://localhost:3000/', {'transports': ['websocket'], 'autoConnect': false});
+  IO.Socket socket = Config.socket;
 
   TextEditingController messageInputController = TextEditingController();
   ScrollController scrollController = ScrollController();
@@ -39,12 +38,13 @@ class _ChatBoxState extends State<ChatBox> {
 
     _messagesFuture = ApiClient.getMessagesBySession(Config.currentSession.id);
 
-    socket = _initSocket(socket);
-    socket.connect();
+    Config.displayMessage = _displayMessage;
   }
 
   @override
   Widget build(BuildContext context) {
+    print(GoRouter.of(context).location);
+
     return FutureBuilder<List<Message>>(
       future: _messagesFuture,
       builder: (context, snapshot) {
@@ -55,13 +55,14 @@ class _ChatBoxState extends State<ChatBox> {
         } else {
           _messages = snapshot.data ?? [];
 
+          print(GoRouter.of(context).location);
           /// - PARENT CONTAINER - ///
           return Container(
             width: chatBoxWidth,
             height: chatBoxHeight,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: AppColors.containerBackground
+              color: AppColors.containerBackgroundLighter
             ),
             child: Column(
               children: [
@@ -99,7 +100,7 @@ class _ChatBoxState extends State<ChatBox> {
                   width: chatBoxWidth,
                   height: inputHeight,
                   decoration: const BoxDecoration(
-                    color: AppColors.containerBackgroundDarker,
+                    color: AppColors.containerBackground,
                     borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20))
                   ),
                   child: Center(
@@ -211,31 +212,31 @@ class _ChatBoxState extends State<ChatBox> {
     });
   }
 
-  IO.Socket _initSocket(IO.Socket socket) {
-    socket.on('connect', (_) {
-      debugPrint('Flutter player connected on ${Config.currentChatId}');
-      socket.emit('join', Config.currentChatId);
-    });
-
-    socket.on('message', (data) {
-      Map<String, dynamic> messageData = jsonDecode(data);
-      Message message = Message(
-          id: messageData['messageID'],
-          chatId: messageData['chatID'],
-          from: messageData['from'],
-          to: messageData['to'],
-          private: messageData['private'],
-          content: messageData['content']
-      );
-      message.time = DateTime.parse(messageData['time']);
-
-      _displayMessage(message);
-    });
-
-    socket.on('res', (data) {
-      debugPrint(data);
-    });
-
-    return socket;
-  }
+  // IO.Socket _initSocket(IO.Socket socket) {
+  //   socket.on('connect', (_) {
+  //     debugPrint('Flutter player connected on ${Config.currentChatId}');
+  //     socket.emit('joinChat', Config.currentChatId);
+  //   });
+  //
+  //   socket.on('message', (data) {
+  //     Map<String, dynamic> messageData = jsonDecode(data);
+  //     Message message = Message(
+  //         id: messageData['messageID'],
+  //         chatId: messageData['chatID'],
+  //         from: messageData['from'],
+  //         to: messageData['to'],
+  //         private: messageData['private'],
+  //         content: messageData['content']
+  //     );
+  //     message.time = DateTime.parse(messageData['time']);
+  //
+  //     _displayMessage(message);
+  //   });
+  //
+  //   socket.on('res', (data) {
+  //     debugPrint(data);
+  //   });
+  //
+  //   return socket;
+  // }
 }

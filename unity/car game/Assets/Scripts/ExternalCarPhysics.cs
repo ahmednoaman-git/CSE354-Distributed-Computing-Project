@@ -61,6 +61,7 @@ public class ExternalCarPhysics : MonoBehaviour
     }
 
     public void updateCarState(string state) {
+        Debug.Log(state);
         JObject parsedState = JObject.Parse(state);
 
         accelerationInput = (float)parsedState["accelerationInput"];

@@ -45,10 +45,35 @@ public class SceneController : MonoBehaviour
         ";
 
         UnityMessageManager.Instance.SendMessageToFlutter("SceneControllerInitialized");
-        // loadGameSettings(recievedInit);
+        // loadGameSettings($@"{{
+        //     ""map"":1,
+        //     ""players"":[
+        //         {{
+        //             ""playerID"":""826ee65a-71d6-4b4f-95b3-d98731e2295d"",
+        //             ""sessionID"":""e0705f4b-1b1f-4817-9218-0821aa7c6eec"",
+        //             ""isClientPlayer"":true,
+        //             ""car"":""Cars/Green/car_green_3""
+        //         }}
+        //     ]
+
+        // }}");
+
+        // // Add a`SpriteRenderer` component to the game object
+        // 
+        // 
+
+        // // Add a Rigidbody2D component to the game object
+        // 
+
+        // // Add a BoxCollider2D component to the game object
+        // 
+
+        // // Add the CarPhysics script to the game object
+        // 
     }
 
     public void loadGameSettings(string gameSettings) {
+        // UnityMessageManager.Instance.SendMessageToFlutter(gameSettings);
 
         JObject parsedInit = JObject.Parse(gameSettings);
         
@@ -60,21 +85,19 @@ public class SceneController : MonoBehaviour
             bool isClientPlayer = (bool)player["isClientPlayer"];
             string carSpritePath = (string)player["car"];
 
-            float positionX = 18.293f;
-            float positionY = 8.324f - 0.876f * i;
+            float positionX = i;
+            float positionY = 0;
+            Vector3 initialPosition = new Vector3(positionX, positionY, 0f);
 
             GameObject carObject = new GameObject(playerID);
+            
+            carObject.transform.position = initialPosition;
+            carObject.transform.localScale = new Vector3(1.64f, 1.64f, 1.64f);
 
             SpriteRenderer spriteRenderer = carObject.AddComponent<SpriteRenderer>();
             spriteRenderer.sprite = Resources.Load<Sprite>(carSpritePath);
-            spriteRenderer.sortingLayerName = "Cars";
 
             Rigidbody2D rigidbody2D = carObject.AddComponent<Rigidbody2D>();
-            rigidbody2D.rotation = 90;
-
-            Vector3 initialPosition = new Vector3(positionX, positionY, 0f);
-            carObject.transform.position = initialPosition;
-            carObject.transform.localScale = new Vector3(1f, 1f, 1f);
 
             BoxCollider2D boxCollider2D = carObject.AddComponent<BoxCollider2D>();
 
@@ -85,13 +108,7 @@ public class SceneController : MonoBehaviour
                 ExternalCarPhysics externalCarPhysics = carObject.AddComponent<ExternalCarPhysics>();
             }
 
-            CarLapCounter carLapCounter = carObject.AddComponent<CarLapCounter>();
-            Debug.Log("Init carlapcounter for:");
-            Debug.Log(carLapCounter.gameObject.name);
-
-            i++;
+            i = i + 3;
         }
-
-        UnityMessageManager.Instance.SendMessageToFlutter("FinishedLoadingGameSettings");
     }
 }

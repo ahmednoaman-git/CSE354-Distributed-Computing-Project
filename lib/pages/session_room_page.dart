@@ -1,6 +1,7 @@
 import 'package:distributed_computing_project/backend/api/api_client.dart';
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/components/chatbox/chatbox.dart';
+import 'package:distributed_computing_project/components/navbar/navbar.dart';
 import 'package:distributed_computing_project/components/sessions/session_waiting_room.dart';
 import 'package:distributed_computing_project/config.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,6 @@ class _SessionRoomPageState extends State<SessionRoomPage> {
   @override
   void initState() {
     super.initState();
-
     if (Config.currentSession.id != widget.urlSessionID) {
       _sessionFuture = ApiClient.getSession(widget.urlSessionID);
       _chatIDFuture = ApiClient.getChatId(widget.urlSessionID);
@@ -32,11 +32,13 @@ class _SessionRoomPageState extends State<SessionRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!Config.isLoggedIn) {
+      context.go('/');
+    }
+
     if (Config.currentSession.id == widget.urlSessionID) {
       return displayRoom();
     }
-    print(GoRouter.of(context).location);
-
 
     return FutureBuilder(
       future: Future.wait([_sessionFuture, _chatIDFuture]),
@@ -51,8 +53,6 @@ class _SessionRoomPageState extends State<SessionRoomPage> {
           Config.currentSession = snapshot.data![0] as Session;
           Config.currentChatId = snapshot.data![1] as String;
 
-          print(GoRouter.of(context).location);
-
           return displayRoom();
         }
       },
@@ -63,16 +63,25 @@ class _SessionRoomPageState extends State<SessionRoomPage> {
     Config.initSocket();
     Config.socket.connect();
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: AppColors.appBackground,
-        body: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: const [
-              SessionWaitingRoom(),
-              ChatBox(),
-            ],
-          ),
+        body: Column(
+          children: [
+            const NavBar(),
+            const Divider(height: 4, thickness: 1, indent: 8, endIndent: 8, color: AppColors.highlightDarkest),
+            Expanded(
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: const [
+                    SessionWaitingRoom(),
+                    ChatBox(height: 650),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -15,7 +15,7 @@ public class CarPhysics : MonoBehaviour
     public float maxSpeed = 20f;
     public float accelerationInput = 0f;
     public float steeringInput = 0f;
-    float rotationAngle = 0f;
+    float rotationAngle = 90f;
     float velocityUp = 0f;
 
     int frameCounter = 0;
@@ -26,10 +26,6 @@ public class CarPhysics : MonoBehaviour
         carRigidBody = GetComponent<Rigidbody2D>();
     }
 
-    void Update()
-    {
-    }
-
     void FixedUpdate()
     {
         ForwardMomentum();
@@ -38,6 +34,7 @@ public class CarPhysics : MonoBehaviour
 
         String stateObject = $@"
             {{
+                ""isState"": true,
                 ""playerID"": ""{gameObject.name}"",
                 ""frame"": {++frameCounter},
                 ""accelerationInput"": {accelerationInput},
@@ -54,7 +51,7 @@ public class CarPhysics : MonoBehaviour
             }}
         ";
 
-        // UnityMessageManager.Instance.SendMessageToFlutter(stateObject); UNCOMMENT
+        UnityMessageManager.Instance.SendMessageToFlutter(stateObject);
     }
 
     private void ForwardMomentum()
@@ -121,4 +118,6 @@ public class CarPhysics : MonoBehaviour
         accelerationInput = inputVector.y;
         steeringInput = inputVector.x;
     }
+
+    public void updateCarState(string state) {}
 }

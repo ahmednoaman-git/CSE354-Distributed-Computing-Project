@@ -42,12 +42,6 @@ TagManager:
   - name: Ground
     uniqueID: 1207784783
     locked: 0
-  - name: Skidmarks
-    uniqueID: 512440541
-    locked: 0
-  - name: Smoke
-    uniqueID: 2672746111
-    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
@@ -60,6 +54,15 @@ TagManager:
   - name: TRACK
     uniqueID: 3909728463
     locked: 0
+  - name: Skidmarks
+    uniqueID: 512440541
+    locked: 0
   - name: TRACK TOP
     uniqueID: 2359921463
+    locked: 0
+  - name: Smoke
+    uniqueID: 2672746111
+    locked: 0
+  - name: Cars
+    uniqueID: 3122249059
     locked: 0

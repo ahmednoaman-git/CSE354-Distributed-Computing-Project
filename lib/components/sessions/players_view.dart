@@ -99,7 +99,7 @@ class _PlayersViewState extends State<PlayersView> {
 
                     CircleAvatar(
                       radius: 15,
-                      backgroundColor: widget.playerStates[player.playerID]['ready'] || player.playerID == Config.currentSessionLeader ? AppColors.accent : AppColors.sessionClosedAccent,
+                      backgroundColor: (widget.playerStates[player.playerID]?['ready'] ?? false) || (player.playerID == Config.currentSessionLeader) ? AppColors.accent : AppColors.sessionClosedAccent,
                     ),
 
                     const SizedBox(width: 10)

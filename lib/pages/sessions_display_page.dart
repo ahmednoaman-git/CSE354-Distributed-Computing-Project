@@ -1,4 +1,5 @@
 import 'package:distributed_computing_project/components/navbar/navbar.dart';
+import 'package:distributed_computing_project/config.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,6 +11,7 @@ class SessionsDisplayPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Config.socket.dispose();
     return MaterialApp(
       home: Scaffold(
         backgroundColor: AppColors.appBackground,

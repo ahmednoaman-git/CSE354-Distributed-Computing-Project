@@ -138,20 +138,20 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
                                     radius: 17,
                                     backgroundColor: AppColors.containerBackgroundLighter,
                                     child: IconButton(
-                                        padding: const EdgeInsets.only(left: 10),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (_typeIndex == 4) {
-                                              _typeIndex = 0;
-                                            } else {
-                                              _typeIndex++;
-                                            }
-                                            _currentCarAssetUrl = 'Assets/Cars/$_currentColor/car_${_currentColor.toLowerCase()}_${_typeIndex + 1}.png';
-                                            _playerStates[Config.currentPlayer.playerID]!['car'] = _currentCarAssetUrl;
-                                            _socket.emit('sessionState', _playerStates[Config.currentPlayer.playerID]);
-                                          });
-                                        },
-                                        icon: const Icon(Icons.arrow_back_ios, color: AppColors.highlight,)
+                                      padding: const EdgeInsets.only(left: 10),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (_typeIndex == 4) {
+                                            _typeIndex = 0;
+                                          } else {
+                                            _typeIndex++;
+                                          }
+                                          _currentCarAssetUrl = 'Assets/Cars/$_currentColor/car_${_currentColor.toLowerCase()}_${_typeIndex + 1}.png';
+                                          _playerStates[Config.currentPlayer.playerID]!['car'] = _currentCarAssetUrl;
+                                          _socket.emit('sessionState', _playerStates[Config.currentPlayer.playerID]);
+                                        });
+                                      },
+                                      icon: const Icon(Icons.arrow_back_ios, color: AppColors.highlight,)
                                     ),
                                   ),
                                   Container(
@@ -219,7 +219,7 @@ class _SessionWaitingRoomState extends State<SessionWaitingRoom> {
                   highlightColor: Colors.transparent,
                   onTap: () {
                     if (Config.currentPlayer.playerID == _leaderID) {
-                      Map<String, dynamic> gameSettings = {'map': 1, 'sessionID': Config.currentSession.id, 'players':[]};
+                      Map<String, dynamic> gameSettings = {'map': 1, 'laps': Config.currentSession.numberOfLaps, 'sessionID': Config.currentSession.id, 'players':[]};
                       for (String playerID in _playerStates.keys) {
                         String unformattedCarUrl = _playerStates[playerID]!['car'];
                         String formattedCarUrl = unformattedCarUrl.substring(7, unformattedCarUrl.length-4);

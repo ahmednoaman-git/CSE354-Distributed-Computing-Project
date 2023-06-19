@@ -1,7 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages, library_prefixes
 
-import 'dart:convert';
-
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/components/chatbox/messagebubble.dart';
 import 'package:distributed_computing_project/config.dart';
@@ -15,7 +13,8 @@ import '../../backend/api/api_client.dart';
 import '../../classes/message.dart';
 
 class ChatBox extends StatefulWidget {
-  const ChatBox({Key? key}) : super(key: key);
+  final double height;
+  const ChatBox({Key? key, required this.height}) : super(key: key);
 
   @override
   State<ChatBox> createState() => _ChatBoxState();
@@ -24,23 +23,23 @@ class ChatBox extends StatefulWidget {
 class _ChatBoxState extends State<ChatBox> {
   Future<List<Message>> _messagesFuture = Future(() => []);
   List<Message> _messages = [];
-  IO.Socket socket = IO.io('http://localhost:3000/', {'transports': ['websocket'], 'autoConnect': false});
+  IO.Socket socket = Config.socket;
 
   TextEditingController messageInputController = TextEditingController();
   ScrollController scrollController = ScrollController();
 
   final double chatBoxWidth = 350;
-  final double chatBoxHeight = 500;
+  double chatBoxHeight = 500;
   final double inputHeight = 65;
 
   @override
   void initState() {
     super.initState();
+    chatBoxHeight = widget.height;
 
     _messagesFuture = ApiClient.getMessagesBySession(Config.currentSession.id);
 
-    socket = _initSocket(socket);
-    socket.connect();
+    Config.displayMessage = _displayMessage;
   }
 
   @override
@@ -61,7 +60,7 @@ class _ChatBoxState extends State<ChatBox> {
             height: chatBoxHeight,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: AppColors.containerBackground
+              color: AppColors.containerBackgroundLighter
             ),
             child: Column(
               children: [
@@ -99,7 +98,7 @@ class _ChatBoxState extends State<ChatBox> {
                   width: chatBoxWidth,
                   height: inputHeight,
                   decoration: const BoxDecoration(
-                    color: AppColors.containerBackgroundDarker,
+                    color: AppColors.containerBackground,
                     borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20))
                   ),
                   child: Center(
@@ -177,7 +176,9 @@ class _ChatBoxState extends State<ChatBox> {
         chatId: Config.currentChatId,
         from: Config.currentPlayer.playerID,
         private: false,
-        content: messageInputController.text
+        content: messageInputController.text,
+        username: Config.currentPlayer.userName,
+        imageUrl: Config.currentPlayer.imageUrl
       );
 
       _displayMessage(message);
@@ -191,7 +192,9 @@ class _ChatBoxState extends State<ChatBox> {
           "to": ${message.to == null ? null : '"${message.to}"'},
           "private": ${message.private},
           "content": "${message.content}",
-          "time": "${message.time}"
+          "time": "${message.time}",
+          "username": "${Config.currentPlayer.userName}",
+          "imageUrl": "${Config.currentPlayer.imageUrl}"
         }
       ''');
       ApiClient.addMessage(message);
@@ -209,33 +212,5 @@ class _ChatBoxState extends State<ChatBox> {
         );
       });
     });
-  }
-
-  IO.Socket _initSocket(IO.Socket socket) {
-    socket.on('connect', (_) {
-      debugPrint('Flutter player connected on ${Config.currentChatId}');
-      socket.emit('join', Config.currentChatId);
-    });
-
-    socket.on('message', (data) {
-      Map<String, dynamic> messageData = jsonDecode(data);
-      Message message = Message(
-          id: messageData['messageID'],
-          chatId: messageData['chatID'],
-          from: messageData['from'],
-          to: messageData['to'],
-          private: messageData['private'],
-          content: messageData['content']
-      );
-      message.time = DateTime.parse(messageData['time']);
-
-      _displayMessage(message);
-    });
-
-    socket.on('res', (data) {
-      debugPrint(data);
-    });
-
-    return socket;
   }
 }

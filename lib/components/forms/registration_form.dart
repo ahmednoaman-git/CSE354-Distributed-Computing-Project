@@ -24,7 +24,7 @@ class RegistrationForm extends StatelessWidget {
       width: formWidth.toDouble(),
       height: formHeight.toDouble(),
       decoration: BoxDecoration(
-        color: AppColors.containerBackground,
+        color: AppColors.containerBackgroundLighter,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(

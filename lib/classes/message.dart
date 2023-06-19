@@ -8,6 +8,8 @@ class Message {
   bool private;
   String content;
   DateTime time = DateTime.now();
+  String username;
+  String imageUrl;
   bool outgoingMessage = true;
 
   Message({
@@ -16,7 +18,9 @@ class Message {
     required this.from,
     this.to,
     required this.private,
-    required this.content
+    required this.content,
+    required this.username,
+    required this.imageUrl
   }) {
     outgoingMessage = from == Config.currentPlayer.playerID;
   }

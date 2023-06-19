@@ -2,8 +2,8 @@ import 'package:distributed_computing_project/backend/api/api_client.dart';
 import 'package:distributed_computing_project/classes/colors.dart';
 import 'package:distributed_computing_project/classes/session.dart';
 import 'package:distributed_computing_project/config.dart';
-import 'package:distributed_computing_project/pages/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SessionCard extends StatelessWidget {
   Session session;
@@ -21,7 +21,7 @@ class SessionCard extends StatelessWidget {
         width: cardWidth.toDouble(),
         height: cardHeight.toDouble(),
         decoration: BoxDecoration(
-          color: AppColors.containerBackgroundDarker,
+          color: AppColors.containerBackground,
           borderRadius: BorderRadius.circular(20)
         ),
         child: Row(
@@ -46,7 +46,9 @@ class SessionCard extends StatelessWidget {
                       fontSize: 19
                     ),
                   ),
+
                   const VerticalDivider(),
+
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -60,7 +62,9 @@ class SessionCard extends StatelessWidget {
                       ))
                     ],
                   ),
+
                   const VerticalDivider(),
+
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -84,9 +88,9 @@ class SessionCard extends StatelessWidget {
                   onPressed: () async {
                     Config.currentSession = session;
                     Config.currentChatId = await ApiClient.getChatId(Config.currentSession.id);
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const HomePage())
-                    );
+                    if (context.mounted) {
+                      context.go('/sessions/${session.id}');
+                    }
                   },
                   icon: const Icon(Icons.arrow_forward, color: AppColors.highlight),
                 ),

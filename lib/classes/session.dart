@@ -1,5 +1,3 @@
-
-
 import 'package:distributed_computing_project/backend/api/api_client.dart';
 import 'package:distributed_computing_project/classes/player.dart';
 
@@ -15,6 +13,7 @@ class Session {
   int numberOfPlayers;
   int numberOfLaps;
   String state;
+  bool? reconnectable;
 
   Session({
     required this.id,

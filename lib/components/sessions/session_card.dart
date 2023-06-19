@@ -94,6 +94,19 @@ class SessionCard extends StatelessWidget {
                   },
                   icon: const Icon(Icons.arrow_forward, color: AppColors.highlight),
                 ),
+              ) : (session.state == 'running' && (session.reconnectable ?? false)) ? CircleAvatar(
+                backgroundColor: AppColors.accent,
+                child: IconButton(
+                  onPressed: () async {
+                    Config.currentSession = session;
+                    Config.currentChatId = await ApiClient.getChatId(Config.currentSession.id);
+                    Config.isReconnecting = true;
+                    if (context.mounted) {
+                      context.go('/game');
+                    }
+                  },
+                  icon: const Icon(Icons.power, color: AppColors.highlight),
+                ),
               ) : null
             ),
             const SizedBox(width: 10)
